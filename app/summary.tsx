@@ -12,7 +12,7 @@ import { Sheet } from '../src/components/Sheet';
  */
 export default function Summary() {
   const router = useRouter();
-  const backToNest = () => router.dismissTo('/(tabs)');
+  const backToNest = () => router.dismissTo('/');
 
   return (
     <Sheet onClose={backToNest}>

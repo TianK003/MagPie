@@ -4,6 +4,15 @@ const { withNativeWind } = require('nativewind/metro');
 
 const config = getDefaultConfig(__dirname);
 
+// whisper.rn: allow ggml model binaries to resolve as assets, and map
+// `buffer` (pulled in by whisper.rn's WAV writer via safe-buffer -> Node core
+// 'buffer') to the JS polyfill so Metro can resolve it in React Native.
+config.resolver.assetExts.push('bin');
+config.resolver.extraNodeModules = {
+  ...config.resolver.extraNodeModules,
+  buffer: require.resolve('buffer/'),
+};
+
 // supabase-js 2.110.x needs no Metro resolver shims: it ships a `react-native`
 // export condition (resolves to the CJS build), pulls in no Node core modules
 // statically, and @supabase/realtime-js selects the runtime's global WebSocket
