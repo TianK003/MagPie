@@ -1,20 +1,40 @@
-import { render, screen } from '@testing-library/react-native';
+import { act, fireEvent, renderRouter, screen } from 'expo-router/testing-library';
 
-import Index from '../app/index';
+import EntryScreen from '../app/index';
+import TabsLayout from '../app/(tabs)/_layout';
+import TabsBrands from '../app/(tabs)/brands';
+import Home from '../app/(tabs)/index';
+import Rank from '../app/(tabs)/rank';
+import Wallet from '../app/(tabs)/wallet';
 
-describe('dev gallery (app/index)', () => {
-  it('renders the primitive gallery: wordmark, type scale and button variants', () => {
-    render(<Index />);
+// The tabs layout declares all four screens, so the context must supply them
+// all (as production does) — otherwise expo-router warns about extraneous ones.
+const entryMap = {
+  index: EntryScreen,
+  '(tabs)/_layout': TabsLayout,
+  '(tabs)/index': Home,
+  '(tabs)/brands': TabsBrands,
+  '(tabs)/rank': Rank,
+  '(tabs)/wallet': Wallet,
+};
 
-    // Type-scale sample rows.
-    expect(screen.getByText('42 hero')).toBeTruthy();
-    expect(screen.getByText('15 body — space grotesk')).toBeTruthy();
+describe('entry screen (app/index)', () => {
+  it('renders the wordmark and the "enter the nest" CTA', async () => {
+    renderRouter(entryMap, { initialUrl: '/' });
+    await act(async () => {});
 
-    // The three Button variants + the demo triggers.
-    expect(screen.getByText('dark')).toBeTruthy();
-    expect(screen.getByText('outline')).toBeTruthy();
-    expect(screen.getByText('gated')).toBeTruthy();
-    expect(screen.getByText('show toast')).toBeTruthy();
-    expect(screen.getByText('open sheet')).toBeTruthy();
+    // Wordmark renders with accessibilityRole="header".
+    expect(screen.getByRole('header')).toBeTruthy();
+    expect(screen.getByText('enter the nest →')).toBeTruthy();
+  });
+
+  it('enters the tabs on CTA press', async () => {
+    renderRouter(entryMap, { initialUrl: '/' });
+    await act(async () => {});
+
+    fireEvent.press(screen.getByText('enter the nest →'));
+    await act(async () => {});
+
+    expect(screen.getByText('home')).toBeTruthy();
   });
 });

@@ -1,8 +1,8 @@
 import { View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useStore } from '../stores';
 import { Toast } from './Toast';
+import { useTabBarTotalHeight } from './tabBarMetrics';
 
 /**
  * Renders the single active toast, bottom-centered above the tab bar.
@@ -15,18 +15,15 @@ import { Toast } from './Toast';
  */
 export function ToastHost() {
   const toast = useStore((s) => s.toast);
-  const insets = useSafeAreaInsets();
+  // Float just above the tab bar (real metric, replacing T2's insets+76 stand-in).
+  const bottom = useTabBarTotalHeight() + 12;
 
   if (!toast) {
     return null;
   }
 
   return (
-    <View
-      pointerEvents="none"
-      className="absolute inset-x-0 items-center px-screen"
-      style={{ bottom: insets.bottom + 76 }}
-    >
+    <View pointerEvents="none" className="absolute inset-x-0 items-center px-screen" style={{ bottom }}>
       <Toast key={toast.id} message={toast.message} />
     </View>
   );

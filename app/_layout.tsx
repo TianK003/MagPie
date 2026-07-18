@@ -40,7 +40,23 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <Stack screenOptions={{ headerShown: false }} />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="index" />
+        <Stack.Screen name="(auth)" />
+        <Stack.Screen name="(onboarding)" />
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="settings" />
+        {/* Recording overlay: NOT a native modal — a slide-up card that keeps the
+            sibling ToastHost on top and audio teardown deterministic (mobile.md §4). */}
+        <Stack.Screen
+          name="session"
+          options={{ presentation: 'card', animation: 'slide_from_bottom', gestureEnabled: false }}
+        />
+        {/* Summary: transparent over the (already-updated) tabs; the Sheet animates itself. */}
+        <Stack.Screen name="summary" options={{ presentation: 'transparentModal', animation: 'none' }} />
+        <Stack.Screen name="invite/[code]" />
+      </Stack>
+      {/* Sibling AFTER <Stack> so it overlays every screen — see ToastHost / mobile.md §4. */}
       <ToastHost />
     </SafeAreaProvider>
   );
