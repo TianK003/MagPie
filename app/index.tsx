@@ -9,6 +9,8 @@ import {
   Animated,
   Easing,
   Image,
+  PermissionsAndroid,
+  Platform,
   Pressable,
   ScrollView,
   Text,
@@ -16,6 +18,11 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { RealtimeTranscriber } from 'whisper.rn/realtime-transcription/index.js';
+import { AudioPcmStreamAdapter } from 'whisper.rn/realtime-transcription/adapters/AudioPcmStreamAdapter.js';
+import type { WhisperContext } from 'whisper.rn';
+
+import { loadWhisper } from '../src/lib/whisper';
 
 const BIRD = require('../assets/magpie-bird.png');
 const ICON = require('../assets/magpie-icon.png');
@@ -56,6 +63,7 @@ type Company = {
   collectors: string; weekMentions: string; payNote: string; desc: string;
 };
 const COMPANIES: Company[] = [
+  { id: 'amazon', name: 'Amazon', letter: 'A', grad: GOLD, ink: '#1a1200', model: 'say', rate: 5, payLabel: '5¢', paySub: 'per say', tag: 'Everything store', say: '"Amazon"', collectors: '18.4k', weekMentions: '142k', payNote: 'Pays 5¢ instantly for every natural, in-person mention Magpie hears.', desc: 'The everything store. Wants top-of-mind word-of-mouth in everyday conversation.' },
   { id: 'nordbrew', name: 'Nordbrew', letter: 'N', grad: BLUE, ink: '#06131c', model: 'say', rate: 2, payLabel: '2¢', paySub: 'per say', tag: 'Cold-brew coffee', say: '"Nordbrew"', collectors: '2.4k', weekMentions: '18.2k', payNote: 'Pays instantly for every natural mention Magpie hears. Bonus keyword this week: "oat foam" (+1¢).', desc: 'Small-batch cold brew from Bergen — cans and taps across Norway. They want word-of-mouth in cafés, gyms and offices.' },
   { id: 'loop', name: 'Loop Fitness', letter: 'L', grad: CYAN, ink: '#14102e', model: 'pool', rate: 1.4, payLabel: 'pool', paySub: 'monthly', tag: 'Gym chain', say: '"Loop"', collectors: '3.1k', weekMentions: '24.7k', payNote: '$40k monthly pool split across all mentions that month — fewer talkers, bigger cut. Currently ≈1.4¢ per mention.', desc: '24/7 gym chain with 60 locations. Looking for mentions among students and young professionals.' },
   { id: 'kilter', name: 'Kilter Bank', letter: 'K', grad: TEAL, ink: '#052019', model: 'pool', rate: 1.1, payLabel: 'pool', paySub: 'monthly', tag: 'Neobank', say: '"Kilter"', collectors: '1.8k', weekMentions: '11.5k', payNote: 'Monthly pool, currently ≈1.1¢ per mention. No scripts — mentions must sound natural or they don\'t count.', desc: 'Neobank for freelancers — instant invoicing, tax pots, and same-day payouts.' },
@@ -78,8 +86,6 @@ const BOARD: BoardRow[] = [
   { rank: 13, initials: 'AN', name: 'Aksel N.', says: 197, cents: 461 },
 ];
 
-const FILLER = ['so', 'anyway', 'I', 'was', 'telling', 'Maja', 'about', 'that', 'place', 'downtown', 'and', 'honestly', 'the', 'cold', 'brew', 'there', 'is', 'so', 'good', 'we', 'should', 'go', 'after', 'the', 'gym', 'tomorrow', 'right', 'yeah', 'she', 'said', 'it', 'gets', 'crazy', 'busy', 'but', "it's", 'worth', 'it', 'every', 'single', 'time', 'no', 'kidding', 'plus', 'they', 'do', 'oat', 'foam', 'now', 'which', 'is', 'kind', 'of', 'amazing'];
-
 const fmtC = (v: number) => {
   const r = Math.round(v * 10) / 10;
   return (r % 1 ? r.toFixed(1) : String(r)) + '¢';
@@ -89,7 +95,6 @@ const fmtD = (cents: number) => '$' + (cents / 100).toFixed(2);
 type Word = { t: string; brand: boolean; id: number };
 type Tab = 'record' | 'brands' | 'ranks' | 'wallet' | 'you';
 
-const SIM_PACE_MS = 3000;
 const SLIDE_X = 319; // 680 * sin(28°)
 const SLIDE_Y = 600; // 680 * cos(28°)
 const BIRD_ANGLE = '35deg';
@@ -121,7 +126,7 @@ export default function MagpieApp() {
   const dark = themeName === 'dark';
 
   const [recording, setRecording] = useState(false);
-  const [selected, setSelected] = useState<string[]>(['nordbrew', 'loop', 'kilter']);
+  const [selected, setSelected] = useState<string[]>(['amazon']);
   const [counts, setCounts] = useState<Record<string, number>>({});
   const [cents, setCents] = useState(0);
   const [instant, setInstant] = useState(0);
@@ -130,12 +135,15 @@ export default function MagpieApp() {
   const [lines, setLines] = useState<[Word[], Word[], Word[]]>([[], [], []]);
 
   const wid = useRef(0);
-  const fi = useRef(0);
-  const hitTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const flashTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const wordTimer = useRef<ReturnType<typeof setInterval> | null>(null);
-  const selRef = useRef(selected);
-  selRef.current = selected;
+
+  // ── on-device whisper (real transcription; "amazon" is the only keyword) ──
+  const whisperRef = useRef<WhisperContext | null>(null);
+  const transcriberRef = useRef<RealtimeTranscriber | null>(null);
+  // words already pushed to the transcript per slice index (whisper refines a
+  // slice's text over time; we only emit the newly-appended words).
+  const sliceWordsRef = useRef<Record<number, number>>({});
+  const [modelReady, setModelReady] = useState(false);
 
   // ── animations ────────────────────────────────────────────────────────────
   const dock = useRef(new Animated.Value(1)).current; // 1 = record-center, 0 = docked in nav
@@ -170,7 +178,7 @@ export default function MagpieApp() {
     Animated.timing(dock, { toValue: tab === 'record' ? 1 : 0, duration: 780, easing: Easing.out(Easing.cubic), useNativeDriver: false }).start();
   }, [tab, dock]);
 
-  // ── demo engine ─────────────────────────────────────────────────────────
+  // ── real transcript engine (fed by on-device whisper) ────────────────────
   const pushWord = useCallback((text: string, brand: boolean) => {
     const w: Word = { t: text, brand, id: ++wid.current };
     setLines(([l0, l1, l2]) => {
@@ -180,39 +188,83 @@ export default function MagpieApp() {
     });
   }, []);
 
-  const hit = useCallback(() => {
-    const sel = selRef.current;
-    if (!sel.length) return;
-    const id = sel[Math.floor(Math.random() * sel.length)];
-    const c = COMPANY(id);
-    setCounts((p) => ({ ...p, [id]: (p[id] || 0) + 1 }));
+  // A confirmed "amazon" mention: credit Amazon (5¢, instant/'say' model) + flash.
+  const registerHit = useCallback(() => {
+    const c = COMPANY('amazon');
+    setCounts((p) => ({ ...p, amazon: (p.amazon || 0) + 1 }));
     setCents((p) => p + c.rate);
-    if (c.model === 'say') setInstant((p) => p + c.rate);
-    else setPool((p) => p + c.rate);
-    setFlash(id);
-    pushWord(c.name, true);
+    setInstant((p) => p + c.rate);
+    setFlash('amazon');
     if (flashTimer.current) clearTimeout(flashTimer.current);
     flashTimer.current = setTimeout(() => setFlash(null), 900);
-  }, [pushWord]);
+  }, []);
 
-  const schedule = useCallback(() => {
-    if (hitTimer.current) clearTimeout(hitTimer.current);
-    hitTimer.current = setTimeout(() => {
-      hit();
-      schedule();
-    }, SIM_PACE_MS * (0.55 + Math.random()));
-  }, [hit]);
+  // Case-insensitive match on the company "amazon" and nothing else.
+  const processWord = useCallback((raw: string) => {
+    const norm = raw.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const isAmazon = norm.includes('amazon');
+    pushWord(raw, isAmazon);
+    if (isAmazon) registerHit();
+  }, [pushWord, registerHit]);
 
-  const stopEngine = useCallback(() => {
-    if (hitTimer.current) clearTimeout(hitTimer.current);
-    if (wordTimer.current) clearInterval(wordTimer.current);
-    hitTimer.current = null;
-    wordTimer.current = null;
+  // whisper.rn emits per-slice results that refine over time; emit only the
+  // words appended since we last saw this slice.
+  const onTranscribe = useCallback((e: { type?: string; sliceIndex?: number; data?: { result?: string } }) => {
+    if (e?.type === 'start' || e?.type === 'end') return;
+    const text = (e?.data?.result || '').trim();
+    if (!text) return;
+    const idx = e.sliceIndex ?? 0;
+    const words = text.split(/\s+/).filter(Boolean);
+    const already = sliceWordsRef.current[idx] || 0;
+    for (let i = already; i < words.length; i += 1) processWord(words[i]);
+    sliceWordsRef.current[idx] = words.length;
+  }, [processWord]);
+
+  const startTranscribe = useCallback(async () => {
+    const ctx = whisperRef.current;
+    if (!ctx) return;
+    if (Platform.OS === 'android') {
+      const res = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO);
+      if (res !== PermissionsAndroid.RESULTS.GRANTED) return;
+    }
+    sliceWordsRef.current = {};
+    const transcriber = new RealtimeTranscriber(
+      { whisperContext: ctx, audioStream: new AudioPcmStreamAdapter() },
+      { audioSliceSec: 5, autoSliceOnSpeechEnd: false, transcribeOptions: { language: 'en' } },
+      { onTranscribe, onError: () => {} },
+    );
+    transcriberRef.current = transcriber;
+    await transcriber.start();
+  }, [onTranscribe]);
+
+  const stopTranscribe = useCallback(async () => {
+    await transcriberRef.current?.stop();
+    transcriberRef.current = null;
+  }, []);
+
+  // Load the tiny.en model once (already cached on-device from a prior run).
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const ctx = await loadWhisper();
+        if (cancelled) return;
+        whisperRef.current = ctx;
+        setModelReady(true);
+      } catch {
+        // leave modelReady false; REC stays disabled with a "loading model" hint
+      }
+    })();
+    return () => {
+      cancelled = true;
+      void transcriberRef.current?.stop();
+      void whisperRef.current?.release();
+    };
   }, []);
 
   const toggleRec = useCallback(() => {
     if (recording) {
-      stopEngine();
+      void stopTranscribe();
       setRecording(false);
       Animated.timing(recAnim, { toValue: 0, duration: 700, useNativeDriver: false }).start();
       // fly out to bottom-right, then snap invisibly back to the top entry point
@@ -233,13 +285,11 @@ export default function MagpieApp() {
         Animated.timing(birdY, { toValue: 0, duration: 1150, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
         Animated.timing(birdOp, { toValue: 1, duration: 900, useNativeDriver: true }),
       ]).start();
-      schedule();
-      if (wordTimer.current) clearInterval(wordTimer.current);
-      wordTimer.current = setInterval(() => pushWord(FILLER[fi.current++ % FILLER.length], false), 380);
+      void startTranscribe();
     }
-  }, [recording, stopEngine, schedule, pushWord, recAnim, birdX, birdY, birdOp]);
+  }, [recording, stopTranscribe, startTranscribe, recAnim, birdX, birdY, birdOp]);
 
-  useEffect(() => () => { stopEngine(); if (flashTimer.current) clearTimeout(flashTimer.current); }, [stopEngine]);
+  useEffect(() => () => { if (flashTimer.current) clearTimeout(flashTimer.current); }, []);
 
   const onBigBtn = useCallback(() => {
     if (tab !== 'record') setTab('record');
@@ -282,7 +332,7 @@ export default function MagpieApp() {
       <View style={{ flex: 1 }}>
         {tab === 'record' && (
           <RecordTab t={t} recording={recording} counts={counts} cents={cents} flash={flash}
-            selected={selected} lines={lines} sessionCount={sessionCount} />
+            selected={selected} lines={lines} sessionCount={sessionCount} modelReady={modelReady} />
         )}
         {tab === 'brands' && detail == null && (
           <BrandsTab t={t} selected={selected} full={full} pad={contentPad} onOpen={setDetail} onToggle={toggleBrand} />
@@ -383,10 +433,11 @@ function NavItem({ label, active, sub, onPress, icon }: { label: string; active:
 }
 
 // ── record tab ──────────────────────────────────────────────────────────
-function RecordTab({ t, recording, counts, cents, flash, selected, lines, sessionCount }: {
+function RecordTab({ t, recording, counts, cents, flash, selected, lines, sessionCount, modelReady }: {
   t: Theme; recording: boolean; counts: Record<string, number>; cents: number; flash: string | null;
-  selected: string[]; lines: [Word[], Word[], Word[]]; sessionCount: number;
+  selected: string[]; lines: [Word[], Word[], Word[]]; sessionCount: number; modelReady: boolean;
 }) {
+  const statusLabel = recording ? 'listening' : modelReady ? 'ready' : 'loading model…';
   return (
     <View style={{ flex: 1 }}>
       <View style={{ paddingHorizontal: 26, paddingTop: 12, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -396,7 +447,7 @@ function RecordTab({ t, recording, counts, cents, flash, selected, lines, sessio
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7 }}>
           <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: recording ? TEAL : t.sub }} />
-          <Text style={{ fontFamily: F.sb, fontSize: 13, color: recording ? TEAL : t.sub }}>{recording ? 'listening' : 'ready'}</Text>
+          <Text style={{ fontFamily: F.sb, fontSize: 13, color: recording ? TEAL : t.sub }}>{statusLabel}</Text>
         </View>
       </View>
 
