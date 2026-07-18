@@ -1,0 +1,63 @@
+# .easignore — controls what EAS Build uploads. When present it REPLACES
+# .gitignore for EAS, so the .gitignore rules are mirrored here, plus the
+# agent-tooling directories below.
+#
+# Why the extra excludes: `.agents/` and `.claude/` are committed agent-tooling
+# skill dirs whose contents are byte-identical (same git tree). EAS's shallow-clone
+# step tries to dedupe them with a symlink, which fails with EPERM on Windows.
+# They are not part of the mobile app build, so we exclude them from the upload.
+
+# ---- mirrored from .gitignore ----
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# debug / logs
+*.log
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# local env files
+.env*.local
+
+# typescript
+*.tsbuildinfo
+
+# generated native folders (Continuous Native Generation via EAS/prebuild)
+/ios
+/android
+
+# tooling / workflow scratch (not part of the app)
+.superpowers/
+.playwright-mcp/
+
+# Claude Code local (machine-specific) settings
+.claude/settings.local.json
+
+# ---- agent tooling (not part of the app build) ----
+.agents/
+.claude/
+.mcp.json
+skills-lock.json
