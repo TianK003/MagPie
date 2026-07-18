@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet"><style>
+body{margin:0;background:#e9e7e0;font-family:"Space Grotesk",system-ui,sans-serif;color:#24241c}
+a{color:#336ca2}a:hover{color:#24527d}
+@keyframes wave{0%,100%{transform:scaleY(.3)}50%{transform:scaleY(1)}}
+@keyframes ripple{0%{transform:scale(.75);opacity:.6}100%{transform:scale(1.5);opacity:0}}
+@keyframes coinpop{0%{transform:translateY(4px);opacity:0}18%{opacity:1}100%{transform:translateY(-36px);opacity:0}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@keyframes toastin{0%{transform:translateY(12px);opacity:0}100%{transform:translateY(0);opacity:1}}
+@keyframes sheetup{0%{transform:translateY(40px);opacity:0}100%{transform:translateY(0);opacity:1}}
+</style></helmet>
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;box-sizing:border-box">
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="390px,844px">
+<div style="position:relative;height:100%;display:flex;flex-direction:column;background:#fdfdfb;color:#24241c;font-family:'Space Grotesk',system-ui,sans-serif;overflow:hidden">
+
+<sc-if value="{{ isLanding }}" hint-placeholder-val="{{ true }}">
+<div style="flex:1;display:flex;flex-direction:column;padding:62px 22px 40px;gap:16px;overflow:auto">
+  <div style="display:flex;align-items:baseline;justify-content:space-between">
+    <div style="font-size:21px;font-weight:700;letter-spacing:-.02em">magpie<span style="color:#336ca2">.</span></div>
+    <div onClick="{{ toastLogin }}" style="font:11px 'IBM Plex Mono',monospace;color:#8a8a80;cursor:pointer;padding:8px 0 8px 12px">log in</div>
+  </div>
+  <div style="margin-top:10px">
+    <div style="font-size:42px;line-height:1.03;font-weight:700;letter-spacing:-.03em;text-wrap:pretty">Get paid<br>to <span style="background:#336ca2;color:#fff;padding:0 8px;border-radius:6px">talk.</span></div>
+    <div style="font-size:15px;line-height:1.45;color:#6b6b60;margin-top:12px;text-wrap:pretty">You already mention brands every day. Magpie pays you for it — <b style="color:#24241c">5¢+ per mention</b>, in real conversations.</div>
+  </div>
+  <div style="position:relative;align-self:center;margin:8px 0 2px">
+    <div style="width:180px;border:1.5px solid #d8d7cc;border-radius:18px;background:#fff;box-shadow:0 2px 12px rgba(20,20,10,.06);padding:18px 14px;display:flex;flex-direction:column;align-items:center;gap:10px">
+      <div style="display:flex;gap:4px;align-items:center;height:30px">
+        <div style="width:5px;height:100%;border-radius:3px;background:#24241c;animation:wave 1.05s ease-in-out infinite"></div>
+        <div style="width:5px;height:100%;border-radius:3px;background:#24241c;animation:wave 1.05s ease-in-out .13s infinite"></div>
+        <div style="width:5px;height:100%;border-radius:3px;background:#336ca2;animation:wave 1.05s ease-in-out .26s infinite"></div>
+        <div style="width:5px;height:100%;border-radius:3px;background:#24241c;animation:wave 1.05s ease-in-out .39s infinite"></div>
+        <div style="width:5px;height:100%;border-radius:3px;background:#336ca2;animation:wave 1.05s ease-in-out .52s infinite"></div>
+        <div style="width:5px;height:100%;border-radius:3px;background:#24241c;animation:wave 1.05s ease-in-out .65s infinite"></div>
+      </div>
+      <div style="font:10.5px 'IBM Plex Mono',monospace;color:#8a8a80">"…so I tried Voltz…"</div>
+      <div style="background:#336ca2;color:#fff;font-weight:700;font-size:14px;padding:4px 14px;border-radius:999px">+5¢</div>
+    </div>
+    <div style="position:absolute;right:-18px;top:-4px;font-weight:700;color:#336ca2;font-size:15px;animation:coinpop 2.2s ease-out infinite">+5¢</div>
+  </div>
+  <div onClick="{{ goOnboard }}" style-hover="transform:translateY(-1px)" style="margin-top:auto;background:#24241c;color:#fff;border-radius:14px;min-height:52px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;cursor:pointer;transition:transform .15s">Add to home screen → start earning</div>
+  <div style="font:10.5px 'IBM Plex Mono',monospace;color:#8a8a80;text-align:center">no app store · no follower count needed</div>
+  <div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap">
+    <span style="border:1.5px solid #d8d7cc;border-radius:999px;padding:4px 11px;font-size:11px;background:#fff">consent-first</span>
+    <span style="border:1.5px solid #d8d7cc;border-radius:999px;padding:4px 11px;font-size:11px;background:#fff">cash out at $5</span>
+    <span style="border:1.5px solid #d8d7cc;border-radius:999px;padding:4px 11px;font-size:11px;background:#fff">you pick the brands</span>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isOnboard }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;display:flex;flex-direction:column;padding:62px 22px 40px;gap:14px;overflow:auto">
+  <div style="display:flex;gap:5px;justify-content:center">
+    <div style="width:34px;height:5px;border-radius:3px;background:{{ dot1 }}"></div>
+    <div style="width:34px;height:5px;border-radius:3px;background:{{ dot2 }}"></div>
+    <div style="width:34px;height:5px;border-radius:3px;background:{{ dot3 }}"></div>
+  </div>
+
+  <sc-if value="{{ ob1 }}" hint-placeholder-val="{{ true }}">
+    <div style="font-size:28px;font-weight:700;letter-spacing:-.02em;margin-top:8px">The honest part</div>
+    <div style="font-size:13.5px;color:#6b6b60;line-height:1.45">Recording conversations is a big deal. Here's exactly how it works:</div>
+    <div style="border:1.5px solid #d8d7cc;border-radius:14px;background:#fff;padding:14px 16px;display:flex;flex-direction:column;gap:10px;font-size:13.5px;line-height:1.4">
+      <div><span style="color:#336ca2;font-weight:700">✓</span> Recording only when <b>you</b> tap REC</div>
+      <div><span style="color:#336ca2;font-weight:700">✓</span> A visible indicator stays on-screen the whole time</div>
+      <div><span style="color:#336ca2;font-weight:700">✓</span> You must tell people you're recording — we surface local consent laws for you</div>
+      <div><span style="color:#336ca2;font-weight:700">✓</span> Audio is processed for mentions, then <b>deleted</b></div>
+      <div><span style="color:#336ca2;font-weight:700">✓</span> We keep only short snippets around each mention</div>
+    </div>
+    <div onClick="{{ toggleConsent }}" style="display:flex;align-items:center;gap:12px;border:1.5px solid {{ consentBd }};background:{{ consentBg }};border-radius:14px;padding:13px 16px;cursor:pointer;min-height:44px;box-sizing:border-box">
+      <div style="width:22px;height:22px;border-radius:7px;border:2px solid #24241c;background:{{ consentBoxBg }};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex:none">{{ consentMark }}</div>
+      <div style="font-size:13.5px;font-weight:600">I understand — and I'll tell the people I talk with</div>
+    </div>
+    <div onClick="{{ obNext1 }}" style="margin-top:auto;background:{{ ob1BtnBg }};color:{{ ob1BtnFg }};border-radius:14px;min-height:52px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;cursor:pointer">Continue</div>
+  </sc-if>
+
+  <sc-if value="{{ ob2 }}" hint-placeholder-val="{{ false }}">
+    <div style="font-size:28px;font-weight:700;letter-spacing:-.02em;margin-top:8px">Pick your brands</div>
+    <div style="font-size:13.5px;color:#6b6b60;line-height:1.45">You only earn from campaigns you opt into. Choose at least 3 — you can change these anytime.</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <sc-for list="{{ pickList }}" as="p" hint-placeholder-count="5">
+        <div onClick="{{ p.toggle }}" style="display:flex;align-items:center;gap:12px;border:1.5px solid {{ p.bd }};background:{{ p.bg }};border-radius:14px;padding:11px 14px;cursor:pointer;min-height:44px;box-sizing:border-box">
+          <div style="width:34px;height:34px;border-radius:10px;background:#f0efe8;border:1.5px dashed #c7c6bb;flex:none;display:flex;align-items:center;justify-content:center;font:9px 'IBM Plex Mono',monospace;color:#8a8a80">logo</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:700;font-size:14px;color:{{ p.fg }}">{{ p.name }}</div>
+            <div style="font:10px 'IBM Plex Mono',monospace;color:{{ p.sub }}">{{ p.cat }} · {{ p.rate }}¢/mention</div>
+          </div>
+          <div style="font-weight:700;font-size:15px;color:{{ p.fg }}">{{ p.mark }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="font:11px 'IBM Plex Mono',monospace;color:#8a8a80;text-align:center">{{ pickCountLabel }}</div>
+    <div onClick="{{ obNext2 }}" style="margin-top:auto;background:{{ ob2BtnBg }};color:{{ ob2BtnFg }};border-radius:14px;min-height:52px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;cursor:pointer">Continue</div>
+  </sc-if>
+
+  <sc-if value="{{ ob3 }}" hint-placeholder-val="{{ false }}">
+    <div style="font-size:28px;font-weight:700;letter-spacing:-.02em;margin-top:8px">Where's the money going?</div>
+    <div style="font-size:13.5px;color:#6b6b60;line-height:1.45">Real cash, low threshold — cash out any time you're over $5.</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <sc-for list="{{ payoutOpts }}" as="o" hint-placeholder-count="3">
+        <div onClick="{{ o.pick }}" style="display:flex;align-items:center;gap:12px;border:1.5px solid {{ o.bd }};background:{{ o.bg }};border-radius:14px;padding:13px 16px;cursor:pointer;min-height:48px;box-sizing:border-box">
+          <div style="width:18px;height:18px;border-radius:50%;border:2px solid #24241c;background:{{ o.dotBg }};flex:none"></div>
+          <div style="font-weight:600;font-size:15px">{{ o.name }}</div>
+          <div style="margin-left:auto;font:10px 'IBM Plex Mono',monospace;color:#8a8a80">{{ o.note }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div onClick="{{ finishOnboard }}" style="margin-top:auto;background:{{ ob3BtnBg }};color:{{ ob3BtnFg }};border-radius:14px;min-height:52px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;cursor:pointer">Let's go →</div>
+  </sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ isApp }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;display:flex;flex-direction:column;overflow:hidden">
+<div style="flex:1;overflow:auto;padding:58px 20px 10px">
+
+  <sc-if value="{{ tabHome }}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px">
+      <div style="font-size:19px;font-weight:700;letter-spacing:-.02em">magpie<span style="color:#336ca2">.</span></div>
+      <div onClick="{{ toastSettings }}" style="font:11px 'IBM Plex Mono',monospace;color:#8a8a80;cursor:pointer;padding:8px 0 8px 12px">settings</div>
+    </div>
+    <div style="background:#24241c;border-radius:18px;padding:18px 18px 16px;color:#fff">
+      <div style="font:10px 'IBM Plex Mono',monospace;color:#a3a294;letter-spacing:.08em">YOUR NEST</div>
+      <div style="font-size:38px;font-weight:700;letter-spacing:-.02em;color:#9cc4e8;margin-top:2px">{{ balanceFmt }}</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px">
+        <div style="font-size:12px;color:#cfcec4">{{ weekLine }}</div>
+        <div onClick="{{ goWallet }}" style="border:1.5px solid #9cc4e8;color:#9cc4e8;border-radius:999px;padding:5px 14px;font-size:12px;font-weight:600;cursor:pointer">cash out</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <div style="flex:1;border:1.5px solid #d8d7cc;border-radius:14px;background:#fff;padding:10px 8px;text-align:center">
+        <div style="font-size:17px;font-weight:700">{{ streak }}d</div>
+        <div style="font:9.5px 'IBM Plex Mono',monospace;color:#8a8a80">streak</div>
+      </div>
+      <div style="flex:1;border:1.5px solid #d8d7cc;border-radius:14px;background:#fff;padding:10px 8px;text-align:center">
+        <div style="font-size:17px;font-weight:700">#{{ youRank }}</div>
+        <div style="font:9.5px 'IBM Plex Mono',monospace;color:#8a8a80">friends</div>
+      </div>
+      <div style="flex:1;border:1.5px solid #d8d7cc;border-radius:14px;background:#fff;padding:10px 8px;text-align:center">
+        <div style="font-size:17px;font-weight:700">{{ mentionsTotal }}</div>
+        <div style="font:9.5px 'IBM Plex Mono',monospace;color:#8a8a80">mentions</div>
+      </div>
+    </div>
+    <div style="font-size:14px;font-weight:700;margin:16px 0 8px">Recent activity</div>
+    <sc-if value="{{ hasActivity }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <sc-for list="{{ activityView }}" as="s" hint-placeholder-count="3">
+          <div style="display:flex;align-items:center;gap:10px;border:1.5px solid #e2e1d8;border-radius:12px;background:#fff;padding:9px 12px">
+            <div style="flex:1;min-width:0">
+              <div style="font-size:12.5px;font-weight:600">{{ s.title }}</div>
+              <div style="font:9.5px 'IBM Plex Mono',monospace;color:#8a8a80">{{ s.meta }}</div>
+            </div>
+            <div style="font-size:12.5px;font-weight:700;color:#336ca2">{{ s.amt }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+    <sc-if value="{{ noActivity }}" hint-placeholder-val="{{ false }}">
+      <div style="border:1.5px dashed #c7c6bb;border-radius:12px;padding:16px;font-size:12.5px;color:#8a8a80;text-align:center">No sessions yet — tap REC below to start your first one.</div>
+    </sc-if>
+  </sc-if>
+
+  <sc-if value="{{ tabBrands }}" hint-placeholder-val="{{ false }}">
+    <div style="font-size:24px;font-weight:700;letter-spacing:-.02em;margin-bottom:2px">Campaigns</div>
+    <div style="font:10.5px 'IBM Plex Mono',monospace;color:#8a8a80;margin-bottom:12px">opt in → mention naturally → get paid</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <sc-for list="{{ brandsView }}" as="b" hint-placeholder-count="5">
+        <div style="border:1.5px solid {{ b.bd }};border-radius:14px;background:#fff;padding:12px 14px;opacity:{{ b.op }}">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:38px;height:38px;border-radius:11px;background:#f0efe8;border:1.5px dashed #c7c6bb;flex:none;display:flex;align-items:center;justify-content:center;font:9px 'IBM Plex Mono',monospace;color:#8a8a80">logo</div>
+            <div style="flex:1;min-width:0">
+              <div style="font-weight:700;font-size:14.5px">{{ b.name }}</div>
+              <div style="font:10px 'IBM Plex Mono',monospace;color:#8a8a80">{{ b.meta }}</div>
+            </div>
+            <div style="background:#336ca2;color:#fff;border-radius:999px;padding:4px 10px;font-size:11.5px;font-weight:700;flex:none">{{ b.rate }}¢</div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px">
+            <div style="font:10px 'IBM Plex Mono',monospace;color:{{ b.noteColor }}">{{ b.note }}</div>
+            <div onClick="{{ b.toggle }}" style="border:1.5px solid {{ b.btnBd }};background:{{ b.btnBg }};color:{{ b.btnFg }};border-radius:999px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;min-height:30px;box-sizing:border-box;display:flex;align-items:center">{{ b.btnLabel }}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ tabRank }}" hint-placeholder-val="{{ false }}">
+    <div style="font-size:24px;font-weight:700;letter-spacing:-.02em;margin-bottom:10px">This week</div>
+    <div style="display:flex;gap:6px;margin-bottom:12px">
+      <span style="background:#24241c;color:#fff;border-radius:999px;padding:5px 14px;font-size:12px;font-weight:600">Friends</span>
+      <span onClick="{{ toastGlobal }}" style="border:1.5px solid #d8d7cc;border-radius:999px;padding:5px 14px;font-size:12px;color:#6b6b60;cursor:pointer">Global</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <sc-for list="{{ lbView }}" as="r" hint-placeholder-count="4">
+        <div style="display:flex;align-items:center;gap:10px;border:1.5px solid {{ r.bd }};background:{{ r.bg }};color:{{ r.fg }};border-radius:12px;padding:9px 12px">
+          <div style="font-weight:700;width:16px">{{ r.rank }}</div>
+          <div style="width:26px;height:26px;border-radius:50%;border:1.5px solid {{ r.avBd }};background:{{ r.avBg }};flex:none"></div>
+          <div style="flex:1;font-size:13.5px;font-weight:{{ r.wt }}">{{ r.name }}</div>
+          <div style="font:11px 'IBM Plex Mono',monospace;color:{{ r.amtColor }}">{{ r.amt }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="border:1.5px solid #d8d7cc;border-radius:14px;background:#fff;padding:12px 14px;margin-top:12px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <div style="font-size:13.5px;font-weight:700">Streak · {{ streak }} days</div>
+        <div style="font:10px 'IBM Plex Mono',monospace;color:#8a8a80">best: 11</div>
+      </div>
+      <div style="display:flex;gap:5px;margin-top:9px">
+        <sc-for list="{{ weekDays }}" as="d" hint-placeholder-count="7">
+          <div style="flex:1;border:1.5px {{ d.bdStyle }} {{ d.bd }};background:{{ d.bg }};color:{{ d.fg }};border-radius:8px;padding:5px 0;text-align:center;font-size:11px;font-weight:600">{{ d.label }}</div>
+        </sc-for>
+      </div>
+      <div style="font:10px 'IBM Plex Mono',monospace;color:#8a8a80;margin-top:8px">{{ streakHint }}</div>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px">
+      <span style="border:1.5px solid #d8d7cc;border-radius:999px;padding:5px 12px;font-size:11.5px;background:#fff">First Fiver</span>
+      <span style="border:1.5px solid #d8d7cc;border-radius:999px;padding:5px 12px;font-size:11.5px;background:#fff">Chatterbox</span>
+      <span style="border:1.5px dashed #c7c6bb;border-radius:999px;padding:5px 12px;font-size:11.5px;color:#a3a294">Brand Loyalist 🔒</span>
+    </div>
+    <div style="background:#24241c;border-radius:14px;padding:13px 16px;margin-top:12px;display:flex;align-items:center;gap:10px">
+      <div style="flex:1;font-size:12.5px;color:#fff">Invite a friend → <b style="color:#9cc4e8">$1 for you, $1 for them</b></div>
+      <div onClick="{{ invite }}" style="background:#9cc4e8;color:#24241c;border-radius:999px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer">Share</div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ tabWallet }}" hint-placeholder-val="{{ false }}">
+    <div style="font-size:24px;font-weight:700;letter-spacing:-.02em;margin-bottom:12px">Your nest</div>
+    <div style="border:1.5px solid #24241c;border-radius:16px;background:#fff;padding:16px;text-align:center">
+      <div style="font-size:36px;font-weight:700;letter-spacing:-.02em">{{ balanceFmt }}</div>
+      <div style="font:10px 'IBM Plex Mono',monospace;color:#8a8a80;margin-top:2px">{{ thresholdLine }}</div>
+      <div style="height:10px;border:1.5px solid #24241c;border-radius:6px;margin-top:10px;overflow:hidden;background:#f0efe8">
+        <div style="width:{{ progressPct }};height:100%;background:#336ca2;transition:width .4s"></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <div onClick="{{ cashOut }}" style="flex:1;background:{{ coBg }};color:{{ coFg }};border-radius:14px;min-height:48px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14.5px;cursor:pointer">Cash out →</div>
+      <div onClick="{{ toastGift }}" style="flex:1;border:1.5px solid #d8d7cc;background:#fff;border-radius:14px;min-height:48px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;line-height:1.2;cursor:pointer">
+        <div style="font-size:12.5px;font-weight:600;line-height:1.2">gift cards</div>
+        <div style="font-size:10.5px;color:#336ca2;font-weight:700;line-height:1.2">+10% bonus</div>
+      </div>
+    </div>
+    <div style="font-size:14px;font-weight:700;margin:16px 0 8px">History</div>
+    <div style="display:flex;flex-direction:column;gap:5px">
+      <sc-for list="{{ walletView }}" as="w" hint-placeholder-count="4">
+        <div style="display:flex;justify-content:space-between;border:1.5px dashed #d8d7cc;border-radius:10px;padding:8px 12px;font-size:12px;color:#6b6b60">
+          <span>{{ w.label }}</span><span style="font-weight:700;color:{{ w.color }}">{{ w.amt }}</span>
+        </div>
+      </sc-for>
+    </div>
+    <div style="font:10px 'IBM Plex Mono',monospace;color:#8a8a80;margin-top:10px;text-align:center">payouts land in 1–2 days · no fees</div>
+  </sc-if>
+
+</div>
+<div style="flex:none;display:flex;border-top:1.5px solid #e2e1d8;background:#fdfdfb;padding:2px 6px 32px">
+  <sc-for list="{{ tabItems }}" as="t" hint-placeholder-count="4">
+    <div onClick="{{ t.go }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0 6px;cursor:pointer;color:{{ t.color }};min-height:44px;box-sizing:border-box;justify-content:center">
+      <div style="width:15px;height:15px;border:1.5px solid currentColor;border-radius:{{ t.shape }};background:{{ t.fill }}"></div>
+      <div style="font-size:10.5px;font-weight:{{ t.wt }}">{{ t.label }}</div>
+    </div>
+  </sc-for>
+</div>
+<div onClick="{{ startRec }}" style="position:absolute;left:50%;bottom:62px;transform:translateX(-50%);width:56px;height:56px;border-radius:50%;background:#336ca2;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;box-shadow:0 4px 14px rgba(51,108,162,.4);cursor:pointer;border:3px solid #fdfdfb">REC</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isRecording }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;background:#fdfdfb;display:flex;flex-direction:column;padding:62px 20px 40px;gap:12px;z-index:5;box-sizing:border-box">
+  <div style="display:flex;justify-content:space-between">
+    <div style="border:1.5px solid #c23b3b;color:#c23b3b;border-radius:999px;padding:5px 12px;font:11px 'IBM Plex Mono',monospace;font-weight:500">● REC {{ timeFmt }}</div>
+    <div style="border:1.5px solid #d8d7cc;border-radius:999px;padding:5px 12px;font:11px 'IBM Plex Mono',monospace;color:{{ voicesColor }}">{{ voicesLabel }}</div>
+  </div>
+  <div style="display:flex;gap:5px;align-items:center;height:46px;justify-content:center;margin-top:6px">
+    <div style="width:7px;height:100%;border-radius:4px;background:#24241c;animation:wave 1.1s ease-in-out infinite"></div>
+    <div style="width:7px;height:100%;border-radius:4px;background:#24241c;animation:wave 1.1s ease-in-out .12s infinite"></div>
+    <div style="width:7px;height:100%;border-radius:4px;background:#336ca2;animation:wave 1.1s ease-in-out .24s infinite"></div>
+    <div style="width:7px;height:100%;border-radius:4px;background:#24241c;animation:wave 1.1s ease-in-out .36s infinite"></div>
+    <div style="width:7px;height:100%;border-radius:4px;background:#336ca2;animation:wave 1.1s ease-in-out .48s infinite"></div>
+    <div style="width:7px;height:100%;border-radius:4px;background:#24241c;animation:wave 1.1s ease-in-out .6s infinite"></div>
+    <div style="width:7px;height:100%;border-radius:4px;background:#24241c;animation:wave 1.1s ease-in-out .72s infinite"></div>
+  </div>
+  <div style="position:relative;align-self:center">
+    <div style="background:#336ca2;color:#fff;font-size:32px;font-weight:700;letter-spacing:-.02em;padding:4px 18px;border-radius:12px">{{ sessEarnFmt }}</div>
+    {{ coinPop }}
+  </div>
+  <div style="font:10.5px 'IBM Plex Mono',monospace;color:#8a8a80;text-align:center">this session · {{ receiptCount }} mentions</div>
+  <div style="flex:1;overflow:auto;display:flex;flex-direction:column;gap:6px">
+    <sc-for list="{{ receiptsView }}" as="m" hint-placeholder-count="1">
+      <div style="border:1.5px solid #d8d7cc;border-radius:12px;background:#fff;padding:8px 12px;font-size:12px;display:flex;gap:8px;align-items:baseline">
+        <span style="font:10px 'IBM Plex Mono',monospace;color:#8a8a80">{{ m.t }}</span>
+        <span style="flex:1;color:#4a4a40">{{ m.text }}</span>
+        <b style="color:#336ca2">+{{ m.amt }}¢</b>
+      </div>
+    </sc-for>
+    <div style="border:1.5px dashed #c7c6bb;border-radius:12px;padding:8px 12px;font-size:12px;color:#a3a294">listening…</div>
+  </div>
+  <div onClick="{{ endRec }}" style="background:#24241c;color:#fff;border-radius:14px;min-height:52px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;cursor:pointer">■ End session</div>
+  <div style="font:9.5px 'IBM Plex Mono',monospace;color:#8a8a80;text-align:center">this screen stays visible while recording — everyone can see it</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ hasSummary }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;background:rgba(36,36,28,.45);z-index:6;display:flex;flex-direction:column;justify-content:flex-end">
+  <div style="background:#fdfdfb;border-radius:22px 22px 0 0;padding:22px 22px 46px;animation:sheetup .3s ease-out">
+    <div style="font:10px 'IBM Plex Mono',monospace;color:#8a8a80;letter-spacing:.08em">SESSION COMPLETE</div>
+    <div style="font-size:40px;font-weight:700;letter-spacing:-.02em;color:#336ca2;margin-top:4px">+{{ sumEarn }}</div>
+    <div style="font-size:13px;color:#6b6b60;margin-top:2px">{{ sumMeta }}</div>
+    <div style="display:flex;flex-direction:column;gap:5px;margin:14px 0">
+      <sc-for list="{{ sumReceipts }}" as="m" hint-placeholder-count="2">
+        <div style="border:1.5px solid #e2e1d8;border-radius:10px;background:#fff;padding:7px 11px;font-size:11.5px;display:flex;gap:8px;align-items:baseline">
+          <span style="font:9.5px 'IBM Plex Mono',monospace;color:#8a8a80">{{ m.t }}</span>
+          <span style="flex:1;color:#4a4a40">{{ m.text }}</span>
+          <b style="color:#336ca2">+{{ m.amt }}¢</b>
+        </div>
+      </sc-for>
+    </div>
+    <div style="border:1.5px solid #d8d7cc;border-radius:12px;background:#fff;padding:10px 14px;font-size:12.5px;display:flex;justify-content:space-between">
+      <span>Streak safe · day {{ streak }}</span><b style="color:#336ca2">+5% bonus active</b>
+    </div>
+    <div onClick="{{ closeSummary }}" style="margin-top:14px;background:#24241c;color:#fff;border-radius:14px;min-height:52px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;cursor:pointer">Back to the nest</div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;left:50%;bottom:124px;transform:translateX(-50%);background:#24241c;color:#fff;border-radius:999px;padding:9px 18px;font-size:12.5px;white-space:nowrap;z-index:9;animation:toastin .25s ease-out;box-shadow:0 4px 14px rgba(20,20,10,.25)">{{ toastMsg }}</div>
+</sc-if>
+
+</div>
+</x-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;startAt&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;landing&quot;,&quot;app&quot;],&quot;default&quot;:&quot;landing&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Demo&quot;},&quot;startFresh&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Demo&quot;},&quot;mentionPaceSecs&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;min&quot;:4,&quot;max&quot;:30,&quot;step&quot;:1,&quot;default&quot;:8,&quot;unit&quot;:&quot;s&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Demo&quot;}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      screen: 'landing', obStep: 1, consent: false, payout: null,
+      tab: 'home', recording: false, summary: null, toast: null,
+      secs: 0, voices: 0, receipts: [], sessEarn: 0,
+      balance: 0, weekEarn: 0, mentionsTotal: 0, streak: 0, todayDone: false,
+      activity: [], walletHist: [],
+      brands: [
+        { id: 'volt', name: 'Voltz Energy', cat: 'energy drink', rate: 8, cap: 20, mult: '2x weekends', on: false, snip: '"…grabbed a Voltz after class…"' },
+        { id: 'strut', name: 'Strut Sneakers', cat: 'footwear', rate: 5, cap: 30, mult: null, on: false, snip: '"…the new Strut runners are actually comfy…"' },
+        { id: 'nimbus', name: 'Nimbus Games', cat: 'gaming', rate: 8, cap: 15, mult: null, on: false, snip: '"…the Nimbus season pass is worth it…"' },
+        { id: 'crisp', name: 'Crisp Soda', cat: 'beverage', rate: 5, cap: 25, mult: null, on: false, snip: '"…I only drink Crisp now…"' },
+        { id: 'lumen', name: 'Lumen Skincare', cat: 'skincare', rate: 6, cap: 10, mult: null, on: false, locked: true, snip: '"…Lumen cleared my skin up…"' }
+      ]
+    };
+  }
+  componentDidMount() {
+    if ((this.props.startAt ?? 'landing') === 'app' && this.state.screen === 'landing') {
+      this.seedAndEnter({ volt: true, strut: true, nimbus: true });
+    }
+  }
+  componentWillUnmount() { clearInterval(this.timer); clearTimeout(this.toastT); }
+  fmt(n) { return '$' + n.toFixed(2); }
+  showToast(msg) {
+    clearTimeout(this.toastT);
+    this.setState({ toast: msg });
+    this.toastT = setTimeout(() => this.setState({ toast: null }), 2400);
+  }
+  seedAndEnter(picks) {
+    const fresh = this.props.startFresh ?? false;
+    const brands = this.state.brands.map(b => ({ ...b, on: b.locked ? false : !!(picks[b.id] ?? b.on) }));
+    const seeded = fresh ? {} : {
+      balance: 12.35, weekEarn: 3.2, mentionsTotal: 27, streak: 4,
+      activity: [
+        { title: 'Chat w/ Sam', meta: '18 min · 2 voices · 2 mentions', amt: '+$0.10' },
+        { title: 'Commute call', meta: '9 min · 2 voices · 1 mention', amt: '+$0.08' },
+        { title: 'Lunch', meta: '24 min · 3 voices · 4 mentions', amt: '+$0.22' }
+      ],
+      walletHist: [
+        { label: 'Mon · 6 mentions', amt: '+$0.34', color: '#336ca2' },
+        { label: 'Sun · 2x weekend', amt: '+$0.88', color: '#336ca2' },
+        { label: 'Sat · invite bonus (jess)', amt: '+$1.00', color: '#336ca2' },
+        { label: 'Fri · cashed out', amt: '−$10.00', color: '#6b6b60' }
+      ]
+    };
+    this.setState({ screen: 'app', tab: 'home', brands, ...seeded });
+  }
+  startRec = () => {
+    clearInterval(this.timer);
+    this.nextMention = 8;
+    this.setState({ recording: true, secs: 0, voices: 0, receipts: [], sessEarn: 0 });
+    this.timer = setInterval(() => {
+      const s = this.state;
+      let { secs, voices, receipts, sessEarn } = s;
+      secs++;
+      if (secs === 3) voices = 1;
+      if (secs === 6) voices = 2;
+      if (secs >= this.nextMention && voices >= 2) {
+        const pool = s.brands.filter(b => b.on);
+        if (pool.length) {
+          const b = pool[receipts.length % pool.length];
+          const mm = String(Math.floor(secs / 60)).padStart(2, '0');
+          const ss = String(secs % 60).padStart(2, '0');
+          receipts = [{ t: mm + ':' + ss, text: b.snip, amt: b.rate }, ...receipts];
+          sessEarn += b.rate / 100;
+        }
+        const pace = this.props.mentionPaceSecs ?? 12;
+        this.nextMention = secs + pace + Math.floor(Math.random() * 6);
+      }
+      this.setState({ secs, voices, receipts, sessEarn });
+    }, 1000);
+  };
+  endRec = () => {
+    clearInterval(this.timer);
+    const s = this.state;
+    const n = s.receipts.length;
+    const mins = Math.max(1, Math.round(s.secs / 60));
+    const amt = s.sessEarn;
+    const entry = { title: 'Just now · session', meta: mins + ' min · ' + Math.max(s.voices, 1) + ' voices · ' + n + ' mentions', amt: '+' + this.fmt(amt) };
+    this.setState({
+      recording: false,
+      summary: { earn: this.fmt(amt), meta: mins + ' min · ' + n + ' paid mentions', receipts: s.receipts },
+      balance: s.balance + amt, weekEarn: s.weekEarn + amt, mentionsTotal: s.mentionsTotal + n,
+      streak: s.todayDone ? s.streak : s.streak + 1, todayDone: true,
+      activity: [entry, ...s.activity],
+      walletHist: [{ label: 'Today · ' + n + ' mentions', amt: '+' + this.fmt(amt), color: '#336ca2' }, ...s.walletHist]
+    });
+  };
+  cashOut = () => {
+    const b = this.state.balance;
+    if (b < 5) { this.showToast('Cash out unlocks at $5 — keep talking'); return; }
+    this.setState({
+      balance: 0,
+      walletHist: [{ label: 'Cashed out → PayPal', amt: '−' + this.fmt(b), color: '#6b6b60' }, ...this.state.walletHist]
+    });
+    this.showToast(this.fmt(b) + ' sent — lands in 1–2 days');
+  };
+  renderVals() {
+    const s = this.state;
+    const acc = '#336ca2', ink = '#24241c', line = '#d8d7cc', muted = '#8a8a80';
+    const picks = {}; s.brands.forEach(b => picks[b.id] = b.on);
+    const pickCount = s.brands.filter(b => b.on && !b.locked).length;
+    const pickList = s.brands.filter(b => !b.locked).map(b => ({
+      name: b.name, cat: b.cat, rate: b.rate,
+      bd: b.on ? acc : line, bg: b.on ? '#eaf1f8' : '#fff', fg: ink,
+      sub: b.on ? '#4a6c8c' : muted, mark: b.on ? '✓' : '+',
+      toggle: () => this.setState({ brands: s.brands.map(x => x.id === b.id ? { ...x, on: !x.on } : x) })
+    }));
+    const payoutOpts = ['PayPal', 'Venmo', 'Bank transfer'].map(name => ({
+      name, note: name === 'Bank transfer' ? '1–2 days' : 'instant',
+      bd: s.payout === name ? acc : line, bg: s.payout === name ? '#eaf1f8' : '#fff',
+      dotBg: s.payout === name ? ink : '#fff',
+      pick: () => this.setState({ payout: name })
+    }));
+    const brandsView = s.brands.map(b => ({
+      name: b.name, rate: b.rate,
+      meta: b.cat + ' · cap ' + b.cap + '/day',
+      note: b.locked ? 'unlocks at level 3' : (b.mult ? b.mult + ' · pays instantly' : 'pays instantly'),
+      noteColor: b.mult && !b.locked ? acc : muted,
+      bd: b.on ? acc : '#e2e1d8', op: b.locked ? '0.55' : '1',
+      btnLabel: b.locked ? 'locked' : (b.on ? '✓ opted in' : '+ join'),
+      btnBg: b.on ? ink : '#fff', btnFg: b.on ? '#fff' : ink, btnBd: b.on ? ink : line,
+      toggle: () => {
+        if (b.locked) { this.showToast('Reach level 3 to unlock this campaign'); return; }
+        this.setState({ brands: this.state.brands.map(x => x.id === b.id ? { ...x, on: !x.on } : x) });
+        this.showToast(b.on ? 'Left ' + b.name : 'Joined ' + b.name + ' — ' + b.rate + '¢/mention');
+      }
+    }));
+    const friends = [
+      { name: 'maya_k', amt: 4.10 }, { name: 'dev.rt', amt: 3.55 },
+      { name: 'you', amt: s.weekEarn, you: true }, { name: 'jess', amt: 2.15 }
+    ].sort((a, b) => b.amt - a.amt);
+    const youRank = friends.findIndex(f => f.you) + 1;
+    const lbView = friends.map((f, i) => ({
+      rank: i + 1, name: f.name, amt: this.fmt(f.amt) + (f.you ? ' · you' : ''),
+      bg: f.you ? acc : '#fff', fg: f.you ? '#fff' : ink, bd: f.you ? acc : '#e2e1d8',
+      wt: f.you ? '700' : '500', amtColor: f.you ? '#dbe9f5' : muted,
+      avBd: f.you ? '#fff' : ink, avBg: f.you ? '#4a80b4' : '#f0efe8'
+    }));
+    const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+    const doneCount = Math.min(4 + (s.todayDone ? 1 : 0), 7);
+    const weekDays = days.map((d, i) => {
+      const done = i < doneCount, today = i === doneCount;
+      return {
+        label: d + (done ? '✓' : today ? '?' : ''),
+        bg: done ? acc : '#fff', fg: done ? '#fff' : (today ? ink : '#b5b4a8'),
+        bd: done ? acc : (today ? ink : line), bdStyle: today && !done ? 'dashed' : 'solid'
+      };
+    });
+    const mm = String(Math.floor(s.secs / 60)).padStart(2, '0');
+    const ss = String(s.secs % 60).padStart(2, '0');
+    const last = s.receipts[0];
+    const coinPop = (s.recording && last) ? React.createElement('div', {
+      key: s.receipts.length,
+      style: { position: 'absolute', right: -30, top: 0, fontWeight: 700, color: acc, fontSize: 15, animation: 'coinpop 1.6s ease-out both' }
+    }, '+' + last.amt + '¢') : null;
+    const tabs = [
+      { id: 'home', label: 'Home', shape: '4px' },
+      { id: 'brands', label: 'Brands', shape: '4px' },
+      { id: 'spacer', label: '', shape: '50%' },
+      { id: 'rank', label: 'Rank', shape: '50%' },
+      { id: 'wallet', label: 'Wallet', shape: '4px' }
+    ];
+    const tabItems = tabs.map(t => t.id === 'spacer' ? { label: '', color: 'transparent', fill: 'transparent', shape: '50%', wt: '400', go: () => {} } : {
+      label: t.label, shape: t.shape,
+      color: s.tab === t.id ? ink : muted, fill: s.tab === t.id ? ink : 'transparent',
+      wt: s.tab === t.id ? '700' : '500',
+      go: () => this.setState({ tab: t.id })
+    });
+    const onbBtn = (ok) => ({ bg: ok ? ink : '#e2e1d8', fg: ok ? '#fff' : '#a3a294' });
+    const b1 = onbBtn(s.consent), b2 = onbBtn(pickCount >= 3), b3 = onbBtn(!!s.payout);
+    return {
+      isLanding: s.screen === 'landing', isOnboard: s.screen === 'onboard', isApp: s.screen === 'app',
+      ob1: s.obStep === 1, ob2: s.obStep === 2, ob3: s.obStep === 3,
+      dot1: s.obStep >= 1 ? ink : '#d8d7cc', dot2: s.obStep >= 2 ? ink : '#d8d7cc', dot3: s.obStep >= 3 ? ink : '#d8d7cc',
+      consentBd: s.consent ? acc : line, consentBg: s.consent ? '#eaf1f8' : '#fff',
+      consentBoxBg: s.consent ? ink : '#fff', consentMark: s.consent ? '✓' : '',
+      ob1BtnBg: b1.bg, ob1BtnFg: b1.fg, ob2BtnBg: b2.bg, ob2BtnFg: b2.fg, ob3BtnBg: b3.bg, ob3BtnFg: b3.fg,
+      pickList, payoutOpts,
+      pickCountLabel: pickCount + ' of 3 minimum picked',
+      goOnboard: () => this.setState({ screen: 'onboard', obStep: 1 }),
+      toggleConsent: () => this.setState({ consent: !s.consent }),
+      obNext1: () => { if (s.consent) this.setState({ obStep: 2 }); },
+      obNext2: () => { if (pickCount >= 3) this.setState({ obStep: 3 }); else this.showToast('Pick at least 3 brands'); },
+      finishOnboard: () => { if (s.payout) this.seedAndEnter(picks); else this.showToast('Pick where the money goes'); },
+      tabHome: s.tab === 'home', tabBrands: s.tab === 'brands', tabRank: s.tab === 'rank', tabWallet: s.tab === 'wallet',
+      tabItems, startRec: this.startRec,
+      balanceFmt: this.fmt(s.balance),
+      weekLine: '+' + this.fmt(s.weekEarn) + ' this week ↗',
+      streak: s.streak, youRank, mentionsTotal: s.mentionsTotal,
+      activityView: s.activity, hasActivity: s.activity.length > 0, noActivity: s.activity.length === 0,
+      goWallet: () => this.setState({ tab: 'wallet' }),
+      brandsView, lbView, weekDays,
+      streakHint: s.todayDone ? 'today counted — streak bonus +5% active' : '1 session today keeps it alive → +5% bonus',
+      invite: () => this.showToast('Invite link copied — $1 each when they join'),
+      thresholdLine: s.balance >= 5 ? 'cash-out threshold $5 · ready' : 'cash-out threshold $5 · ' + this.fmt(5 - s.balance) + ' to go',
+      progressPct: Math.min(100, Math.round(s.balance / 5 * 100)) + '%',
+      coBg: s.balance >= 5 ? ink : '#e2e1d8', coFg: s.balance >= 5 ? '#fff' : '#a3a294',
+      cashOut: this.cashOut, walletView: s.walletHist,
+      isRecording: s.recording, timeFmt: mm + ':' + ss,
+      voicesLabel: s.voices >= 2 ? '2 voices ✓' : (s.voices === 1 ? '1 voice…' : 'detecting…'),
+      voicesColor: s.voices >= 2 ? acc : muted,
+      sessEarnFmt: this.fmt(s.sessEarn), receiptCount: s.receipts.length,
+      receiptsView: s.receipts, coinPop, endRec: this.endRec,
+      hasSummary: !!s.summary,
+      sumEarn: s.summary ? s.summary.earn : '', sumMeta: s.summary ? s.summary.meta : '',
+      sumReceipts: s.summary ? s.summary.receipts : [],
+      closeSummary: () => this.setState({ summary: null, tab: 'home' }),
+      hasToast: !!s.toast, toastMsg: s.toast || '',
+      toastLogin: () => this.showToast('Login not in this prototype'),
+      toastSettings: () => this.showToast('Settings not in this prototype'),
+      toastGlobal: () => this.showToast('Global board needs more magpies first'),
+      toastGift: () => this.showToast('Gift card store not in this prototype')
+    };
+  }
+}
+</script>
+</body>
+</html>
