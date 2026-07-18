@@ -6,6 +6,7 @@ const MIC_USAGE =
 const config: ExpoConfig = {
   name: 'magpie',
   slug: 'magpie',
+  owner: 'tiank003',
   scheme: 'magpie',
   version: '1.0.0',
   orientation: 'portrait',
@@ -89,6 +90,11 @@ const config: ExpoConfig = {
     //   },
     // ],
   ],
+  extra: {
+    eas: {
+      projectId: '828ee329-aa8b-43d6-b80f-d250600480d6',
+    },
+  },
   experiments: {
     typedRoutes: true,
   },
