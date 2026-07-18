@@ -1,0 +1,49 @@
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# debug / logs
+*.log
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# local env files
+# NOTE: .env and .env.example ARE committed intentionally — they hold only
+# public, client-safe EXPO_PUBLIC_* values. Only *.local overrides are ignored.
+.env*.local
+
+# typescript
+*.tsbuildinfo
+
+# generated native folders (Continuous Native Generation via EAS/prebuild)
+/ios
+/android
+
+# tooling / workflow scratch (not part of the app)
+.superpowers/
+.playwright-mcp/
+
+# Claude Code local (machine-specific) settings — shared config lives elsewhere
+.claude/settings.local.json
