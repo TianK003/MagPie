@@ -13,5 +13,5 @@ The approved plan (v2) at `C:\Users\admin\.claude\plans\i-want-you-to-federated-
 - `daily_counters.day` is the user-local day; weekend multiplier bounded to local-weekend ∩ [Fri 12:00 UTC, Mon 12:00 UTC].
 - Invite bonus: per-inviter caps (3/day, 10 lifetime) + `invite_tombstones` (sha256 of email, survives account deletion); streak increments monotonic, max one per server UTC day.
 - New `keyword_sightings` table (server-observed keyword events from diarize transcripts; text discarded) as soft anti-fabrication signal.
-- STT: OpenAI realtime model is `gpt-realtime-whisper` (NOT gpt-4o-mini-transcribe); ElevenLabs WS URL requires `model_id=scribe_v2_realtime`; audio package is `@siteed/expo-audio-studio`.
+- STT: OpenAI realtime model is `gpt-realtime-whisper` (NOT gpt-4o-mini-transcribe); ElevenLabs WS URL requires `model_id=scribe_v2_realtime`; audio package is `@siteed/audio-studio` (canonical name verified at install — `@siteed/expo-audio-studio` is a deprecated re-export shim with no config plugin; ALWAYS import from `@siteed/audio-studio`).
 - Mobile: ui zustand slice owned by T2; rank screen sequenced T21→T22; deep-link invite code persisted through auth/onboarding + manual code-entry fallback; pre-degraded-mode WS loss shows "connection lost — mentions paused".
