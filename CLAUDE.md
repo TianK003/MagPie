@@ -15,7 +15,7 @@ The Expo app is scaffolded and runs on a **custom dev client** (Expo SDK 57 / RN
 - `__tests__/` — Jest suites (spotter, redaction, money, streak, session machine, stores, tokens, nav shell, supabase smoke).
 - Design references (not code to port): `design_handoff_magpie_app/` (current **dark-theme** design — `magpie-standalone.html` opens in a browser), `magpie-prototype-standalone.html` (original light-theme demo, fakes mentions on a timer), `Magpie Prototype.dc.html`, and `ios-frame.jsx` (bezel wrapper — **do not implement it**).
 
-**Design note:** the shipped app pivoted to the **dark-theme / Nunito** design in `design_handoff_magpie_app/`. The light-theme, Space Grotesk token spec in "Design system" below documents the *original* design intent; treat the dark-theme handoff as the current source of truth for the implemented screens.
+**Design note:** the shipped app pivoted to the **dark-theme / Nunito** design in `design_handoff_magpie_app/`, which the "Design system" section below now documents. The original light-theme / Space Grotesk spec is superseded — its tokens still linger in `src/theme/tokens.ts` + `tailwind.config.js` (and in git history) but are no longer the design of record.
 
 The **full written design spec** (screen-by-screen, exhaustive) lives in git history: `git show 7ca4989:README.md` — **stack-agnostic design intent** (follow its visuals/copy/interactions; ignore its Vite-PWA tech assumptions — this project is React Native on Supabase).
 
@@ -81,19 +81,25 @@ Init early, respect consent, **session replay OFF on the recording screen**. Fun
 
 Do not integrate a payout API yet. Ship the wallet UI + ledger. "Cash out" inserts a `payout_requests` row and shows the success toast; fulfil manually for now. Keep it **ledger-first** — every cent traceable to a `mentions` row (timestamp + redacted snippet). A real provider (e.g. PayPal Payouts) comes later behind the same interface.
 
-## Design system (recreate pixel-perfect — high-fidelity, final)
+## Design system (dark-theme, Nunito — current)
 
-Map these into NativeWind tokens. Full screen-by-screen spec: `git show 7ca4989:README.md`; interactive reference: `magpie-prototype-standalone.html`.
+The shipped app (`app/index.tsx`) uses the **dark-theme, Nunito** design in `design_handoff_magpie_app/` (source: `Magpie.dc.html`; `magpie-standalone.html` opens in a browser). Full screen-by-screen spec: `git show 7ca4989:README.md`. Recreate remaining screens against these values, pixel-perfect.
 
-**Colors** — ink `#24241c`; app bg `#fdfdfb`; accent (blue) `#336ca2`; accent tint (on dark) `#9cc4e8`; selected-row text on accent `#dbe9f5`; selected surface tint `#eaf1f8`; borders `#d8d7cc` (strong) / `#e2e1d8` (soft) / `#c7c6bb` (dashed); muted text `#6b6b60` / `#8a8a80` / `#a3a294` / `#b5b4a8`; recording red `#c23b3b`; disabled button bg `#e2e1d8` + text `#a3a294`.
+> **Token drift:** these values are currently hardcoded as constants in `app/index.tsx`; `src/theme/tokens.ts` + `tailwind.config.js` still hold the *old* light-theme tokens. Re-map the values below into those token files before building new screens so the "hex only in tokens" rule holds again.
 
-**Type** — **Space Grotesk** (400/500/600/700), heading letter-spacing −0.02 to −0.03em; **IBM Plex Mono** (400/500) for data/labels (9.5–11px, muted, occasionally uppercase +.08em). Scale: 42px hero · 36–40px money figures · 24–28px titles · 14–16px buttons/body · 12–13.5px secondary · 9.5–11px mono labels. Load both via `expo-font`.
+**Colors** — two themes, **dark is default** (light is a toggle in the You tab).
+- Dark: bg `#14304a`; fg `#f2f8fb`; muted/sub `rgba(242,248,251,0.62)`; card `rgba(255,255,255,0.08)`; border/line `rgba(255,255,255,0.14)`; chip `rgba(255,255,255,0.13)`; raised button `#1d4260`.
+- Light: bg `#e6f4fb`; fg `#17384c`; sub `rgba(23,56,76,0.6)`; card `#ffffff`; line `rgba(23,56,76,0.12)`; chip `#d4ecf7`; button `#ffffff`.
+- Accents (flat — **no gradients**): primary blue `#4aaee0`; money-figure blue `#38ade0`; positive/active teal `#33c6a7`; cyan `#45c5e5`; gold `#ecb22e` (top-3 rank). Ink on accent surfaces (button/tile text): `#06131c`.
+- Tints: blue highlight `rgba(74,174,224,0.15–0.16)` (active row / mention flash); selected-card border `rgba(74,174,224,0.65)`; teal chip `rgba(51,198,167,0.25)`; record-button glow `rgba(74,174,224,0.10)`. Status pill is teal when `listening`, muted otherwise (no separate recording-red).
 
-**Shape/spacing** — radii 14 (cards/buttons) / 18 (hero) / 12 (rows) / 999 (pills) / 22 (sheet top); borders 1.5px; screen padding 20–22px; card padding 12–18px; **all tap targets ≥44px** (buttons 48–52px min-height); respect safe-area insets (`react-native-safe-area-context`). Shadows minimal.
+**Type** — **Nunito** only (400 Regular / 500 Medium / 600 SemiBold / 700 Bold / 800 ExtraBold), via `expo-font`. No IBM Plex Mono, no Space Grotesk in the current design. Slight *positive* tracking (+0.3–0.5px) on small caps-y labels + the wordmark. Scale: 44px total-earned hero · 40px wallet money · 26px tab titles · 24px detail title · 19–21px stat values · 16–18px section/brand names · 15px body · 14–14.5px buttons/amounts · 12.5–13.5px secondary · 10.5–11.5px labels/nav.
 
-**Screens** (recreate all): Landing/first-run → Onboarding (3 gated, forward-only steps: consent checklist → pick ≥3 brands → payout method) → app tabs **Home ("the nest")**, **Brands (Campaigns)**, **Rank (leaderboard + streak + badges + invite)**, **Wallet** → **Recording session** overlay → **Session summary** bottom sheet. 5-cell tab bar with a center **REC FAB** (56px blue circle) floating over the gap.
+**Shape/spacing** — radii: 22 (nav bar, wallet/profile hero cards) / 20 (standard cards) / 18 (large tile) / 16 (stat tiles, primary buttons) / 15 (rank rows) / 14 (letter tiles, mention rows) / 999 (pills); borders 1px (1.5px on selected/emphasis cards + your leaderboard row); screen padding 24px (26px on the record header/transcript); card padding 13–22px; **tap targets ≥44px**; respect safe-area insets (`react-native-safe-area-context`). Shadows minimal (record button carries a soft `#1e5a78` glow).
 
-**Animations** (use `react-native-reanimated`): waveform bars scaleY loop (~1.05s, staggered ~.13s); coin `+N¢` pop (rise + fade ~1.6s, re-triggered per mention); summary sheet slide-up (.3s); wallet progress bar width (.4s); toasts slide-up+fade, auto-dismiss 2.4s, single-instance.
+**Screens** — 5 destinations: **Record** (the "nest" — wordmark, live status pill, transcript strip, per-brand mention counts, session total), **Brands** (roster picker, ≤3 selected, + brand-detail view), **Ranks** (weekly leaderboard, your row highlighted), **Wallet** (available balance, cash-out, ledger rows), **You** (profile, totals, earnings-by-model, dark/light toggle). The nav is a floating rounded bar with 4 items (Brands · Ranks | Wallet · You) and a **morphing center record button** that sits large-and-centered on the Record tab and **docks into the nav gap** on the others. Onboarding (consent → ≥3 brands → payout) remains per the route scaffolding.
+
+**Animations** (`Animated` from `react-native` in the current screen; `react-native-reanimated` still available): three concentric record rings spinning at 7.5s / 11s (reverse) / 9.2s; magpie bird bob (±7px, 2.3s ease-in-out) + fly-in/out on record toggle (~1.15s cubic); record-button dock morph (~780ms cubic); rings/glow fade with recording state (~700ms); transcript words fade in blue→fg, brand words→teal (~900ms); mention-flash row highlight (~900ms); toasts slide-up+fade, auto-dismiss 2.4s, single-instance.
 
 ## Conventions
 
