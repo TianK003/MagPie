@@ -6,15 +6,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Magpie is a **mobile-native app (React Native, iOS + Android, built with EAS)** that pays everyday people for mentioning sponsor brands in real, in-person conversations. The user opts into brand campaigns, taps **REC** before a conversation, the app **verifies 2+ voices are present**, transcribes speech **live (English)**, detects brand mentions, and credits a micro-reward (5–8¢) per legitimate mention. Balances cash out to real money at a $5 threshold. Gamification (leaderboards, day streaks) drives retention; **anti-gaming logic** (voice gate, per-brand daily caps, natural-conversation verification, cooldowns) is a first-class product concern — spamming keywords/company names must not pay. Target audience: Gen Z, casual-smart tone.
 
-> This repo currently contains only **design references** — the app has not been scaffolded yet. See "Repository state" below.
+## Repository state (scaffolded)
 
-## Repository state (greenfield)
+The Expo app is scaffolded and runs on a **custom dev client** (Expo SDK 57 / RN 0.86, Android-first). Structure:
+- `app/` — Expo Router routes. The **current app is a single-screen port** in `app/index.tsx`: a dark-theme, Nunito, full-flow demo (REC → live counter → "2 voices ✓" → summary) with a **self-contained demo engine (fake mention detection on a timer)** plus **real on-device Whisper** (`whisper.rn`) + native PCM mic wired behind it. The route-group scaffolding from the earlier multi-screen build (`(auth)`, `(onboarding)`, `(tabs)`, `session`, `summary`, `settings`, `invite`) is still present.
+- `src/` — `components/` (Button, TabBar, RecFab, Sheet, Toast, …), `lib/` (keyword spotter + fuzzy variants, redaction, money/streak, session state machine, ring buffer + WAV, swappable `stt`/`audio`/`api` interfaces + mocks, `whisper`), `stores/` (Zustand slices auth/brands/session/wallet/social/ui + mock fixtures), `theme/tokens.ts`, `types/`.
+- `supabase/migrations/` — 11 applied migrations (RLS'd tables, budgeted campaigns, append-only ledger, daily counters, social/badges, SECURITY DEFINER RPCs, storage bucket, seed).
+- `__tests__/` — Jest suites (spotter, redaction, money, streak, session machine, stores, tokens, nav shell, supabase smoke).
+- Design references (not code to port): `design_handoff_magpie_app/` (current **dark-theme** design — `magpie-standalone.html` opens in a browser), `magpie-prototype-standalone.html` (original light-theme demo, fakes mentions on a timer), `Magpie Prototype.dc.html`, and `ios-frame.jsx` (bezel wrapper — **do not implement it**).
 
-Present today:
-- `ios-frame.jsx` — an iPhone bezel wrapper used **only** to present the HTML demo. **Do not implement it**; the app is the content inside the bezel.
-- `magpie-prototype-standalone.html` — self-contained interactive demo. **Open in a browser** to see the intended look, animations, and flows. It is a **visual reference, not code to port**. It fakes mention detection on a timer.
-- `Magpie Prototype.dc.html` — original prototype source (needs its own runtime; reference only).
-- The **full written design spec** (screen-by-screen, exhaustive) lives in git history — the design-handoff README from the initial commit: `git show 7ca4989:README.md`. It is **stack-agnostic design intent** — follow its visuals/copy/interactions exactly, but **ignore its tech assumptions** (that older handoff targeted a Vite PWA on Vercel; this project is React Native on Supabase). If useful, restore it as a design doc, but keep this CLAUDE.md as the source of truth for the stack.
+**Design note:** the shipped app pivoted to the **dark-theme / Nunito** design in `design_handoff_magpie_app/`. The light-theme, Space Grotesk token spec in "Design system" below documents the *original* design intent; treat the dark-theme handoff as the current source of truth for the implemented screens.
+
+The **full written design spec** (screen-by-screen, exhaustive) lives in git history: `git show 7ca4989:README.md` — **stack-agnostic design intent** (follow its visuals/copy/interactions; ignore its Vite-PWA tech assumptions — this project is React Native on Supabase).
 
 ## Tech stack (chosen — do not swap without asking)
 
